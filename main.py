@@ -6,8 +6,7 @@ import operator
 
 class City:
 
-    def __init__(self, id, name, x, y):
-        self.id = id
+    def __init__(self, name, x, y):
         self.name = name
         self.x = x
         self.y = y
@@ -27,9 +26,15 @@ class Evolution:
     def evolve(self, number_of_generations, r):
         self.rank_population(r)
         for i in range(number_of_generations):
-            for j in self.population:
-                j.mutation()
+            for j in range(len(self.population)):
+                print(j, self.population[j].quality)
+            for j in range(10, 39):
+                self.population[j].mutation()
+
+            for k in range(25, 39):
+                self.population[k].cross(self.population[k - 15])
             self.rank_population(r)
+            print("---------------dupsko-------------------")
         return self.population[0]
 
 
@@ -37,7 +42,7 @@ class Specimen:
     def __init__(self, size):
         self.size = size
         self.quality = 999
-        self.hospitals = [random.randint(0, 1) for i in range(size)]
+        self.hospitals = [random.choices([0, 1], [0.8, 0.2])[0] for i in range(size)]
 
     def check_quality(self, cities, r):
         img_x = Image.open('map4.png')
@@ -58,11 +63,23 @@ class Specimen:
             self.quality = score
         else:
             self.quality = 999
-        print(self.quality)
 
     def mutation(self):
         mutating_gene = random.randint(0, 73)
+        if random.randint(0, 1) == 1:
+            while self.hospitals[mutating_gene] == 0:
+                mutating_gene = random.randint(0, 73)
+        else:
+            while self.hospitals[mutating_gene] == 1:
+                mutating_gene = random.randint(0, 73)
         self.hospitals[mutating_gene] = (self.hospitals[mutating_gene] + 1) % 2
+
+    def cross(self, other):
+        where = random.randint(0, 73)
+        gene1 = self.hospitals[where:] + other.hospitals[:where]
+        gene2 = other.hospitals[where:] + self.hospitals[:where]
+        self.hospitals = gene1
+        other.hospitals = gene2
 
 
 class Cities:
@@ -72,14 +89,12 @@ class Cities:
 
     def load_cities(self, file):
         data = []
-        x = 0
         with open(file) as file:
             for line in file:
                 temp = line.strip().split(",")
                 data.append(temp)
         for i, j, k in data:
-            self.cities.append(City(x, i, int(j), int(k)))
-            x += 1
+            self.cities.append(City(i, int(j), int(k)))
 
 
 def paint_map(cities_with_hospitals, r):
@@ -99,8 +114,8 @@ def main():
     start_time = time.time()
     cities_with_hospitals = []
 
-    evolution = Evolution(cities.cities, 20)
-    winner = evolution.evolve(5, 187)
+    evolution = Evolution(cities.cities, 40)
+    winner = evolution.evolve(30, 187)
 
     for i in range(len(winner.hospitals)):
         if winner.hospitals[i] == 1:
