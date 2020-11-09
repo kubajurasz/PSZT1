@@ -1,6 +1,7 @@
 import random
 from PIL import Image, ImageDraw
 import time
+import operator
 
 
 class City:
@@ -14,123 +15,38 @@ class City:
 
 class Evolution:
 
-    def __init__(self, cities):
+    def __init__(self, cities, population_size):
         self.cities = cities
-        self.specimen_1 = Specimen(1, 74)
-        self.specimen_2 = Specimen(1, 74)
-        self.map = []
-        self.map_size = 74
+        self.population = [Specimen(len(cities)) for i in range(population_size)]
 
-    def evolve(self):
-        quality_1 = 999
-        quality_2 = 999
-        counter_1 = 0
-        counter_2 = 0
-        random.seed(None)
-        eliminated = random.randint(0, 73)
-        self.specimen_1.hospitals[eliminated] = 0
+    def rank_population(self, r):
+        for i in self.population:
+            i.check_quality(self.cities, r)
+            self.population.sort(key=operator.attrgetter('quality'))
 
-        quality_1 = self.specimen_1.check_quality(self.cities)
-
-        if quality_1 == 999:
-            self.replace_specimen(self.specimen_1, 1)
-        else:
-            self.replace_specimen(self.specimen_2, 2)
-
-        while counter_1 < 500 and counter_2 < 500:
-            quality_1 = self.specimen_1.check_quality(self.cities)
-            quality_2 = self.specimen_2.check_quality(self.cities)
-
-            if random.randint(1, 8) == 1:
-                print("mutacja")
-                if quality_1 < quality_2:
-                    self.mutation(self.specimen_1, 1)
-                    counter_1 = counter_1 + 1
-                    counter_2 = 0
-                else:
-                    self.mutation(self.specimen_2, 2)
-                    counter_1 = 0
-                    counter_2 = counter_2 + 1
-                continue
-
-            print("rep")
-            if quality_1 < quality_2:
-                self.replace_specimen(self.specimen_1, 1)
-                counter_1 = counter_1 + 1
-                counter_2 = 0
-            else:
-                self.replace_specimen(self.specimen_2, 2)
-                counter_1 = 0
-                counter_2 = counter_2 + 1
-
-            print("counter_1 :", counter_1, "counter_2 :", counter_2, "Q1: ", quality_1, "Q2:", quality_2)
-
-        if counter_1 == 500:
-            return self.specimen_1
-        else:
-            return self.specimen_2
-
-    def replace_specimen(self, specimen, num):
-        found = 0
-        random.seed(None)
-        while found == 0:
-            eliminated = random.randint(0, 73)
-            if specimen.hospitals[eliminated] == 1:
-                found = 1
-
-        if num == 1:
-            self.specimen_2.hospitals = specimen.hospitals.copy()
-            self.specimen_2.hospitals[eliminated] = 0
-            self.specimen_2.size = specimen.size - 1
-
-        else:
-            self.specimen_1.hospitals = specimen.hospitals.copy()
-            self.specimen_1.hospitals[eliminated] = 0
-            self.specimen_1.size = specimen.size - 1
-
-    def mutation(self, specimen, num):
-        found = 0
-        random.seed(None)
-
-        while found == 0:
-            eliminated = random.randint(0, 73)
-            if specimen.hospitals[eliminated] == 1:
-                found = 1
-
-        found = 0
-
-        while found == 0:
-            added = random.randint(0, 73)
-            if specimen.hospitals[added] == 0:
-                found = 1
-
-        if num == 1:
-            self.specimen_2.hospitals = specimen.hospitals.copy()
-            self.specimen_2.hospitals[eliminated] = 0
-            self.specimen_2.hospitals[added] = 1
-
-        else:
-            self.specimen_1.hospitals = specimen.hospitals.copy()
-            self.specimen_1.hospitals[eliminated] = 0
-            self.specimen_1.hospitals[added] = 1
+    def evolve(self, number_of_generations, r):
+        self.rank_population(r)
+        for i in range(number_of_generations):
+            for j in self.population:
+                j.mutation()
+            self.rank_population(r)
+        return self.population[0]
 
 
 class Specimen:
-    def __init__(self, generation, size):
-        self.generation = generation + 1
+    def __init__(self, size):
         self.size = size
-        self.hospitals = []
-        for i in range(74):
-            self.hospitals.append(1)
+        self.quality = 999
+        self.hospitals = [random.randint(0, 1) for i in range(size)]
 
-    def check_quality(self, cities):
+    def check_quality(self, cities, r):
         img_x = Image.open('map4.png')
         draw = ImageDraw.Draw(img_x)
         score = 0
 
         for i in range(len(cities)):
             if self.hospitals[i] == 1:
-                draw.ellipse((cities[i].x - 187, cities[i].y - 187, cities[i].x + 187, cities[i].y + 187),
+                draw.ellipse((cities[i].x - r, cities[i].y - r, cities[i].x + r, cities[i].y + r),
                              fill=(0, 0, 255))
 
         img_x.save('imageCheck.png', 'PNG')
@@ -139,9 +55,14 @@ class Specimen:
             for i in range(len(self.hospitals)):
                 if self.hospitals[i] == 1:
                     score += 1
-            return score
+            self.quality = score
         else:
-            return 999
+            self.quality = 999
+        print(self.quality)
+
+    def mutation(self):
+        mutating_gene = random.randint(0, 73)
+        self.hospitals[mutating_gene] = (self.hospitals[mutating_gene] + 1) % 2
 
 
 class Cities:
@@ -178,8 +99,8 @@ def main():
     start_time = time.time()
     cities_with_hospitals = []
 
-    evolution = Evolution(cities.cities)
-    winner = evolution.evolve()
+    evolution = Evolution(cities.cities, 20)
+    winner = evolution.evolve(5, 187)
 
     for i in range(len(winner.hospitals)):
         if winner.hospitals[i] == 1:
@@ -190,6 +111,7 @@ def main():
     for i in range(len(cities_with_hospitals)):
         print(cities_with_hospitals[i].name)
 
+    print(len(cities_with_hospitals))
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
