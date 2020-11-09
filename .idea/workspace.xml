@@ -20,12 +20,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="8c09ec4a-91d1-4777-8b34-413aec9fff03" name="Default Changelist" comment="Initial commit">
-      <change afterPath="$PROJECT_DIR$/.idea/.gitignore" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/.idea/other.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/data.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/pythonProject2.iml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/pythonProject2.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/data2.csv" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/image1.png" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/image2.png" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/main.py" beforeDir="false" afterPath="$PROJECT_DIR$/main.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/map1.png" beforeDir="false" afterPath="$PROJECT_DIR$/map1.png" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/map2.png" beforeDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -114,7 +115,9 @@
       <workItem from="1603804682683" duration="6267000" />
       <workItem from="1603838110428" duration="19780000" />
       <workItem from="1604072623668" duration="4249000" />
-      <workItem from="1604170248497" duration="29816000" />
+      <workItem from="1604170248497" duration="33933000" />
+      <workItem from="1604779209440" duration="1627000" />
+      <workItem from="1604914740432" duration="13245000" />
     </task>
     <task id="LOCAL-00001" summary="Initial commit">
       <created>1603791959989</created>
@@ -123,7 +126,14 @@
       <option name="project" value="LOCAL" />
       <updated>1603791959989</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Initial commit">
+      <created>1604443485114</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1604443485114</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -158,40 +168,44 @@
       <screen x="0" y="0" width="1600" height="870" />
     </state>
     <state x="584" y="139" key="Github.UntrackedFilesDialog/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1603791624139" />
-    <state width="1557" height="226" key="GridCell.Tab.0.bottom" timestamp="1604432105690">
+    <state width="1557" height="226" key="GridCell.Tab.0.bottom" timestamp="1604930805823">
       <screen x="0" y="0" width="1600" height="870" />
     </state>
-    <state width="1557" height="226" key="GridCell.Tab.0.bottom/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604432105690" />
-    <state width="1397" height="226" key="GridCell.Tab.0.bottom/0.0.1600.870/1600.0.1440.870@1600.0.1440.870" timestamp="1603921633607" />
+    <state width="1557" height="226" key="GridCell.Tab.0.bottom/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604930805823" />
+    <state width="1397" height="226" key="GridCell.Tab.0.bottom/0.0.1600.870/1600.0.1440.870@1600.0.1440.870" timestamp="1604915382099" />
     <state width="1557" height="226" key="GridCell.Tab.0.bottom/0.0.1600.870@0.0.1600.870" timestamp="1604252015364" />
-    <state width="1557" height="226" key="GridCell.Tab.0.center" timestamp="1604432105690">
+    <state width="1557" height="226" key="GridCell.Tab.0.center" timestamp="1604930805823">
       <screen x="0" y="0" width="1600" height="870" />
     </state>
-    <state width="1557" height="226" key="GridCell.Tab.0.center/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604432105690" />
-    <state width="1397" height="226" key="GridCell.Tab.0.center/0.0.1600.870/1600.0.1440.870@1600.0.1440.870" timestamp="1603921633607" />
+    <state width="1557" height="226" key="GridCell.Tab.0.center/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604930805823" />
+    <state width="1397" height="226" key="GridCell.Tab.0.center/0.0.1600.870/1600.0.1440.870@1600.0.1440.870" timestamp="1604915382099" />
     <state width="1557" height="226" key="GridCell.Tab.0.center/0.0.1600.870@0.0.1600.870" timestamp="1604252015364" />
-    <state width="1557" height="226" key="GridCell.Tab.0.left" timestamp="1604432105689">
+    <state width="1557" height="226" key="GridCell.Tab.0.left" timestamp="1604930805823">
       <screen x="0" y="0" width="1600" height="870" />
     </state>
-    <state width="1557" height="226" key="GridCell.Tab.0.left/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604432105689" />
-    <state width="1397" height="226" key="GridCell.Tab.0.left/0.0.1600.870/1600.0.1440.870@1600.0.1440.870" timestamp="1603921633606" />
+    <state width="1557" height="226" key="GridCell.Tab.0.left/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604930805823" />
+    <state width="1397" height="226" key="GridCell.Tab.0.left/0.0.1600.870/1600.0.1440.870@1600.0.1440.870" timestamp="1604915382098" />
     <state width="1557" height="226" key="GridCell.Tab.0.left/0.0.1600.870@0.0.1600.870" timestamp="1604252015364" />
-    <state width="1557" height="226" key="GridCell.Tab.0.right" timestamp="1604432105690">
+    <state width="1557" height="226" key="GridCell.Tab.0.right" timestamp="1604930805823">
       <screen x="0" y="0" width="1600" height="870" />
     </state>
-    <state width="1557" height="226" key="GridCell.Tab.0.right/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604432105690" />
-    <state width="1397" height="226" key="GridCell.Tab.0.right/0.0.1600.870/1600.0.1440.870@1600.0.1440.870" timestamp="1603921633607" />
+    <state width="1557" height="226" key="GridCell.Tab.0.right/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604930805823" />
+    <state width="1397" height="226" key="GridCell.Tab.0.right/0.0.1600.870/1600.0.1440.870@1600.0.1440.870" timestamp="1604915382099" />
     <state width="1557" height="226" key="GridCell.Tab.0.right/0.0.1600.870@0.0.1600.870" timestamp="1604252015364" />
-    <state x="392" y="167" key="Vcs.Push.Dialog.v2" timestamp="1603791980299">
+    <state x="392" y="167" key="Vcs.Push.Dialog.v2" timestamp="1604443491946">
       <screen x="0" y="0" width="1600" height="870" />
     </state>
-    <state x="392" y="167" key="Vcs.Push.Dialog.v2/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1603791980299" />
+    <state x="392" y="167" key="Vcs.Push.Dialog.v2/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604443491946" />
+    <state x="617" y="348" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2" timestamp="1604780337708">
+      <screen x="0" y="0" width="1600" height="870" />
+    </state>
+    <state x="617" y="348" key="com.intellij.openapi.vcs.update.UpdateOrStatusOptionsDialogupdate-v2/0.0.1600.870/1600.0.1440.870@0.0.1600.870" timestamp="1604780337708" />
     <state x="463" y="182" key="search.everywhere.popup" timestamp="1603807505780">
       <screen x="0" y="0" width="1600" height="870" />
     </state>
     <state x="463" y="182" key="search.everywhere.popup/0.0.1600.870@0.0.1600.870" timestamp="1603807505780" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/pythonProject2$main.coverage" NAME="main Coverage Results" MODIFIED="1604432105675" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/pythonProject2$main.coverage" NAME="main Coverage Results" MODIFIED="1604930805807" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

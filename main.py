@@ -1,6 +1,6 @@
-import random, cv2
-import numpy as np
+import random
 from PIL import Image, ImageDraw
+import time
 
 
 class City:
@@ -124,28 +124,21 @@ class Specimen:
             self.hospitals.append(1)
 
     def check_quality(self, cities):
-        img_x = Image.open('map2.png')
+        img_x = Image.open('map4.png')
         draw = ImageDraw.Draw(img_x)
         score = 0
-
-        test = Image.open('map1.png')
-        testdraw = ImageDraw.Draw(test)
 
         for i in range(len(cities)):
             if self.hospitals[i] == 1:
                 draw.ellipse((cities[i].x - 187, cities[i].y - 187, cities[i].x + 187, cities[i].y + 187),
                              fill=(0, 0, 255))
-                testdraw.ellipse((cities[i].x - 187, cities[i].y - 187, cities[i].x + 187, cities[i].y + 187),
-                                 outline=(0, 0, 100, 100))
 
-        # img_x.show()
         img_x.save('imageCheck.png', 'PNG')
-        test.save('test.png', 'PNG')
 
-        if open("imageCheck.png", "rb").read() == open("image2.png", "rb").read():
+        if open("imageCheck.png", "rb").read() == open("imageCheck3.png", "rb").read():
             for i in range(len(self.hospitals)):
                 if self.hospitals[i] == 1:
-                    score = score + 1
+                    score += 1
             return score
         else:
             return 999
@@ -165,22 +158,7 @@ class Cities:
                 data.append(temp)
         for i, j, k in data:
             self.cities.append(City(x, i, int(j), int(k)))
-            x = x + 1
-
-
-def check_map(cities, specimen, r):
-    img2 = Image.open('map2.png')
-    draw = ImageDraw.Draw(img2)
-
-    for i in range(len(cities)):
-        if specimen[i] == 1:
-            draw.ellipse((cities[i].x - r, cities[i].y - r, cities[i].x + r, cities[i].y + r),
-                         fill=(0, 0, 255))
-
-    img2.show()
-    img2.save('image1.png', 'PNG')
-
-    return True if open("image1.png", "rb").read() == open("image2.png", "rb").read() else False
+            x += 1
 
 
 def paint_map(cities_with_hospitals, r):
@@ -196,8 +174,8 @@ def paint_map(cities_with_hospitals, r):
 
 def main():
     cities = Cities()
-    cities.load_cities("data2.csv")
-
+    cities.load_cities("data.csv")
+    start_time = time.time()
     cities_with_hospitals = []
 
     evolution = Evolution(cities.cities)
@@ -207,8 +185,12 @@ def main():
         if winner.hospitals[i] == 1:
             cities_with_hospitals.append(cities.cities[i])
 
+    paint_map(cities_with_hospitals, 187)
+
     for i in range(len(cities_with_hospitals)):
         print(cities_with_hospitals[i].name)
+
+    print("--- %s seconds ---" % (time.time() - start_time))
 
 
 if __name__ == '__main__':
