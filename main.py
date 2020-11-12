@@ -1,6 +1,8 @@
-import random, cv2
-import numpy as np
+import random
+import time
+import operator
 from PIL import Image, ImageDraw
+import xlsxwriter
 
 
 class City:
@@ -14,133 +16,127 @@ class City:
 
 class Evolution:
 
-    def __init__(self, cities):
+    def __init__(self, cities, population, rounds, delete_cities, mutate):
         self.cities = cities
-        self.specimen_1 = Specimen(1, 74)
-        self.specimen_2 = Specimen(1, 74)
-        self.map = []
-        self.map_size = 74
+        self.mutate = mutate
+        self.delete_cities = delete_cities
+        self.rounds = rounds
+        self.population = population
+        self.specimens = []
+
+        for i in range(population):
+            self.specimens.append(Specimen(0, 99, 0, self.delete_cities))
 
     def evolve(self):
-        quality_1 = 999
-        quality_2 = 999
-        counter_1 = 0
-        counter_2 = 0
         random.seed(None)
-        eliminated = random.randint(0, 73)
-        self.specimen_1.hospitals[eliminated] = 0
+        winner_counter = -1
+        duel = [0, 1]
+        winner = -1
 
-        quality_1 = self.specimen_1.check_quality(self.cities)
+        while winner_counter < self.rounds:
+            duel[0] = random.randint(0, self.population - 1)
+            wrong = 1
+            while wrong == 1:
+                duel[1] = random.randint(0, self.population - 1)
+                if duel[0] != duel[1]:
+                    wrong = 0
 
-        if quality_1 == 999:
-            self.replace_specimen(self.specimen_1, 1)
-        else:
-            self.replace_specimen(self.specimen_2, 2)
+            if self.specimens[duel[0]].quality == self.specimens[duel[1]].quality == 999:
+                continue
+            quality_1 = self.specimens[duel[0]].check_quality(self.cities)
+            quality_2 = self.specimens[duel[1]].check_quality(self.cities)
 
-        while counter_1 < 500 and counter_2 < 500:
-            quality_1 = self.specimen_1.check_quality(self.cities)
-            quality_2 = self.specimen_2.check_quality(self.cities)
-
-            if random.randint(1, 8) == 1:
-                print("mutacja")
+            if random.randint(1, self.mutate) == 1:
+              #  print("mutacja")
                 if quality_1 < quality_2:
-                    self.mutation(self.specimen_1, 1)
-                    counter_1 = counter_1 + 1
-                    counter_2 = 0
+                    self.mutation(duel[0], duel[1])
+                    self.specimens[duel[0]].counter = self.specimens[duel[0]].counter + 1
+                    self.specimens[duel[1]].counter = 0
+                    winner_counter = self.specimens[duel[0]].counter
+                    winner = duel[0]
                 else:
-                    self.mutation(self.specimen_2, 2)
-                    counter_1 = 0
-                    counter_2 = counter_2 + 1
+                    self.mutation(duel[1], duel[0])
+                    self.specimens[duel[1]].counter = self.specimens[duel[1]].counter + 1
+                    self.specimens[duel[0]].counter = 0
+                    winner_counter = self.specimens[duel[1]].counter
+                    winner = duel[1]
                 continue
 
-            print("rep")
+           # print("rep")
             if quality_1 < quality_2:
-                self.replace_specimen(self.specimen_1, 1)
-                counter_1 = counter_1 + 1
-                counter_2 = 0
+                self.replace_specimen(duel[0], duel[1])
+                self.specimens[duel[0]].counter = self.specimens[duel[0]].counter + 1
+                self.specimens[duel[1]].counter = 0
+                winner_counter = self.specimens[duel[0]].counter
+                winner = duel[0]
             else:
-                self.replace_specimen(self.specimen_2, 2)
-                counter_1 = 0
-                counter_2 = counter_2 + 1
+                self.replace_specimen(duel[1], duel[0])
+                self.specimens[duel[1]].counter = self.specimens[duel[1]].counter + 1
+                self.specimens[duel[0]].counter = 0
+                winner_counter = self.specimens[duel[1]].counter
+                winner = duel[1]
 
-            print("counter_1 :", counter_1, "counter_2 :", counter_2, "Q1: ", quality_1, "Q2:", quality_2)
+        return self.specimens[winner]
 
-        if counter_1 == 500:
-            return self.specimen_1
-        else:
-            return self.specimen_2
-
-    def replace_specimen(self, specimen, num):
+    def replace_specimen(self, winner, looser):
         found = 0
         random.seed(None)
         while found == 0:
             eliminated = random.randint(0, 73)
-            if specimen.hospitals[eliminated] == 1:
+            if self.specimens[winner].hospitals[eliminated] == 1:
                 found = 1
 
-        if num == 1:
-            self.specimen_2.hospitals = specimen.hospitals.copy()
-            self.specimen_2.hospitals[eliminated] = 0
-            self.specimen_2.size = specimen.size - 1
+        self.specimens[looser].hospitals = self.specimens[winner].hospitals.copy()
+        self.specimens[looser].hospitals[eliminated] = 0
+        self.specimens[looser].quality = self.specimens[looser].check_quality(self.cities)
 
-        else:
-            self.specimen_1.hospitals = specimen.hospitals.copy()
-            self.specimen_1.hospitals[eliminated] = 0
-            self.specimen_1.size = specimen.size - 1
-
-    def mutation(self, specimen, num):
+    def mutation(self, winner, looser):
         found = 0
         random.seed(None)
 
         while found == 0:
             eliminated = random.randint(0, 73)
-            if specimen.hospitals[eliminated] == 1:
+            if self.specimens[winner].hospitals[eliminated] == 1:
                 found = 1
 
         found = 0
 
         while found == 0:
             added = random.randint(0, 73)
-            if specimen.hospitals[added] == 0:
+            if self.specimens[winner].hospitals[added] == 0:
                 found = 1
 
-        if num == 1:
-            self.specimen_2.hospitals = specimen.hospitals.copy()
-            self.specimen_2.hospitals[eliminated] = 0
-            self.specimen_2.hospitals[added] = 1
-
-        else:
-            self.specimen_1.hospitals = specimen.hospitals.copy()
-            self.specimen_1.hospitals[eliminated] = 0
-            self.specimen_1.hospitals[added] = 1
+        self.specimens[looser].hospitals = self.specimens[winner].hospitals.copy()
+        self.specimens[looser].hospitals[eliminated] = 0
+        self.specimens[looser].hospitals[added] = 0
+        self.specimens[looser].quality = self.specimens[looser].check_quality(self.cities)
 
 
 class Specimen:
-    def __init__(self, generation, size):
+    def __init__(self, generation, quality, counter, delete_cities):
         self.generation = generation + 1
-        self.size = size
         self.hospitals = []
+        self.quality = quality
+        self.counter = counter
+        self.delete_cities = delete_cities
+
         for i in range(74):
             self.hospitals.append(1)
+
+        for i in range(self.delete_cities):
+            self.hospitals[random.randint(0, 73)] = 0
 
     def check_quality(self, cities):
         img_x = Image.open('map2.png')
         draw = ImageDraw.Draw(img_x)
         score = 0
 
-        test = Image.open('map1.png')
-        testdraw = ImageDraw.Draw(test)
-
         for i in range(len(cities)):
             if self.hospitals[i] == 1:
                 draw.ellipse((cities[i].x - 187, cities[i].y - 187, cities[i].x + 187, cities[i].y + 187),
                              fill=(0, 0, 255))
-                testdraw.ellipse((cities[i].x - 187, cities[i].y - 187, cities[i].x + 187, cities[i].y + 187),
-                                 outline=(0, 0, 100, 100))
 
-        # img_x.show()
         img_x.save('imageCheck.png', 'PNG')
-        test.save('test.png', 'PNG')
 
         if open("imageCheck.png", "rb").read() == open("image2.png", "rb").read():
             for i in range(len(self.hospitals)):
@@ -168,47 +164,52 @@ class Cities:
             x = x + 1
 
 
-def check_map(cities, specimen, r):
-    img2 = Image.open('map2.png')
-    draw = ImageDraw.Draw(img2)
-
-    for i in range(len(cities)):
-        if specimen[i] == 1:
-            draw.ellipse((cities[i].x - r, cities[i].y - r, cities[i].x + r, cities[i].y + r),
-                         fill=(0, 0, 255))
-
-    img2.show()
-    img2.save('image1.png', 'PNG')
-
-    return True if open("image1.png", "rb").read() == open("image2.png", "rb").read() else False
-
-
-def paint_map(cities_with_hospitals, r):
-    img1 = Image.open('map1.png')
-
-    draw1 = ImageDraw.Draw(img1)
-
-    for i in cities_with_hospitals:
-        draw1.ellipse((i.x - r, i.y - r, i.x + r, i.y + r), outline=(0, 0, 100, 100))
-
-    img1.show()
-
-
 def main():
+    id = 1
     cities = Cities()
     cities.load_cities("data2.csv")
-
     cities_with_hospitals = []
 
-    evolution = Evolution(cities.cities)
-    winner = evolution.evolve()
+    # evolution = Evolution(cities.cities, 30, 500)
+    # winner = evolution.evolve()
 
-    for i in range(len(winner.hospitals)):
-        if winner.hospitals[i] == 1:
-            cities_with_hospitals.append(cities.cities[i])
+    # for i in range(len(winner.hospitals)):
+    #     if winner.hospitals[i] == 1:
+    #         cities_with_hospitals.append(cities.cities[i])
+    # print("****************************************")
+    # for i in range(len(cities_with_hospitals)):
+    #     print(cities_with_hospitals[i].name)
+    #
+    # print("W sumie: ", len(cities_with_hospitals))
+    workbook = xlsxwriter.Workbook('Scores2.xlsx')
+    worksheet = workbook.add_worksheet()
+    worksheet.write(0, 0, 'ID')
+    worksheet.write(0, 1, 'Wynik')
+    worksheet.write(0, 2, 'Czas (s)')
+    worksheet.write(0, 3, 'Populacja')
+    worksheet.write(0, 4, 'Zasięg')
 
-    for i in range(len(cities_with_hospitals)):
-        print(cities_with_hospitals[i].name)
+    for i in range(300):
+        counter = random.randint(50, 500)
+        start_time = time.time()
+        population = random.randint(2, 30)
+        mutate = random.randint(2, 20)
+        delete_cities = random.randint(5, 60)
+        evolution = Evolution(cities.cities, population, counter, delete_cities,
+                              mutate)
+        winner = evolution.evolve()
+        for i in range(len(winner.hospitals)):
+            if winner.hospitals[i] == 1:
+                cities_with_hospitals.append(cities.cities[i])
+        worksheet.write(id, 0, id)
+        worksheet.write(id, 1, len(cities_with_hospitals))
+        worksheet.write(id, 2, time.time() - start_time)
+        worksheet.write(id, 3, population)
+        worksheet.write(id, 4, counter)
+        id = id+1
+        cities_with_hospitals.clear()
+
+    workbook.close()
 
 
 if __name__ == '__main__':
