@@ -1,6 +1,5 @@
 import random
 import time
-import operator
 from PIL import Image, ImageDraw
 import xlsxwriter
 
@@ -47,7 +46,6 @@ class Evolution:
             quality_2 = self.specimens[duel[1]].check_quality(self.cities)
 
             if random.randint(1, self.mutate) == 1:
-              #  print("mutacja")
                 if quality_1 < quality_2:
                     self.mutation(duel[0], duel[1])
                     self.specimens[duel[0]].counter = self.specimens[duel[0]].counter + 1
@@ -62,7 +60,6 @@ class Evolution:
                     winner = duel[1]
                 continue
 
-           # print("rep")
             if quality_1 < quality_2:
                 self.replace_specimen(duel[0], duel[1])
                 self.specimens[duel[0]].counter = self.specimens[duel[0]].counter + 1
@@ -81,6 +78,7 @@ class Evolution:
     def replace_specimen(self, winner, looser):
         found = 0
         random.seed(None)
+        eliminated = 0
         while found == 0:
             eliminated = random.randint(0, 73)
             if self.specimens[winner].hospitals[eliminated] == 1:
@@ -93,7 +91,8 @@ class Evolution:
     def mutation(self, winner, looser):
         found = 0
         random.seed(None)
-
+        eliminated = 0
+        added = 0
         while found == 0:
             eliminated = random.randint(0, 73)
             if self.specimens[winner].hospitals[eliminated] == 1:
@@ -165,51 +164,33 @@ class Cities:
 
 
 def main():
-    id = 1
     cities = Cities()
     cities.load_cities("data2.csv")
     cities_with_hospitals = []
 
-    # evolution = Evolution(cities.cities, 30, 500)
-    # winner = evolution.evolve()
+    evolution = Evolution(cities.cities, 20, 500, 30, 8)
+    winner = evolution.evolve()
 
-    # for i in range(len(winner.hospitals)):
-    #     if winner.hospitals[i] == 1:
-    #         cities_with_hospitals.append(cities.cities[i])
-    # print("****************************************")
-    # for i in range(len(cities_with_hospitals)):
-    #     print(cities_with_hospitals[i].name)
-    #
-    # print("W sumie: ", len(cities_with_hospitals))
-    workbook = xlsxwriter.Workbook('Scores2.xlsx')
-    worksheet = workbook.add_worksheet()
-    worksheet.write(0, 0, 'ID')
-    worksheet.write(0, 1, 'Wynik')
-    worksheet.write(0, 2, 'Czas (s)')
-    worksheet.write(0, 3, 'Populacja')
-    worksheet.write(0, 4, 'Zasięg')
+    for i in range(len(winner.hospitals)):
+        if winner.hospitals[i] == 1:
+            cities_with_hospitals.append(cities.cities[i])
+    print("****************************************")
+    for i in range(len(cities_with_hospitals)):
+        print(cities_with_hospitals[i].name)
 
-    for i in range(300):
-        counter = random.randint(50, 500)
-        start_time = time.time()
-        population = random.randint(2, 30)
-        mutate = random.randint(2, 20)
-        delete_cities = random.randint(5, 60)
-        evolution = Evolution(cities.cities, population, counter, delete_cities,
-                              mutate)
-        winner = evolution.evolve()
-        for i in range(len(winner.hospitals)):
-            if winner.hospitals[i] == 1:
-                cities_with_hospitals.append(cities.cities[i])
-        worksheet.write(id, 0, id)
-        worksheet.write(id, 1, len(cities_with_hospitals))
-        worksheet.write(id, 2, time.time() - start_time)
-        worksheet.write(id, 3, population)
-        worksheet.write(id, 4, counter)
-        id = id+1
-        cities_with_hospitals.clear()
+    print("****************************************")
+    print("W sumie: ", len(cities_with_hospitals))
 
-    workbook.close()
+    background = Image.open('map1.png')
+    foreground = Image.new('RGB', (900, 800), (50, 50, 50))
+    mask = Image.new('L', (900, 800), 0)
+    draw = ImageDraw.Draw(mask)
+    for i in range(len(cities_with_hospitals)):
+        draw.ellipse((cities_with_hospitals[i].x - 187, cities_with_hospitals[i].y - 187,
+                      cities_with_hospitals[i].x + 187, cities_with_hospitals[i].y + 187),
+                     outline=100, fill=150)
+    result = Image.composite(foreground, background, mask)
+    result.show()
 
 
 if __name__ == '__main__':
