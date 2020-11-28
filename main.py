@@ -16,8 +16,14 @@ class Evolution:
 
     def __init__(self, cities, population_size):
         self.cities = cities
-        self.population = [Specimen(len(cities), [random.choices([0, 1], [0.7, 0.3])[0] for i in range(len(cities))]) for i in range(population_size)]
+        self.population = [Specimen(len(cities), [random.choices([0, 1], [0.7, 0.3])[0] for _ in range(len(cities))])
+                           for _ in range(population_size)]
         self.next_generation = []
+        self.population_size = population_size
+        self.winner = Specimen(len(cities), [random.choices([0, 1], [0.7, 0.3])[0] for _ in range(len(cities))])
+
+    def get_best(self):
+        return self.winner
 
     def rank_population(self, r):
         for i in self.population:
@@ -28,23 +34,24 @@ class Evolution:
         self.rank_population(r)
         for i in range(number_of_generations):
             self.next_generation = []
-            for _ in range(10):
-                self.next_generation += self.population[random.randint(0, 9)].cross(self.population[random.randint(0, 9)])
+            for _ in range(int(self.population_size / 2)):
+                self.next_generation += self.population[random.randint(0, int(self.population_size / 2) - 1)]\
+                    .cross(self.population[random.randint(0, int(self.population_size / 2) - 1)])
 
-            for x in self.next_generation:
-                x.mutation_2()
-                x.mutation(1 / 74)
-                x.check_quality(self.cities, r)
+            for j in self.next_generation:
+                j.mutation_2()
+                j.mutation(1 / 74)
+                j.check_quality(self.cities, r)
 
             self.next_generation.sort(key=operator.attrgetter('quality'))
-            self.population = self.population[0:10] + self.next_generation[0:10]
+            self.population = self.population[0:int(self.population_size / 2)] + self.next_generation[0:int(self.population_size / 2)]
             self.rank_population(r)
 
             print("---------------new top 7---------------")
-            for x in range(7):
-                print(self.population[x].quality)
+            for j in range(7):
+                print(self.population[j].quality)
 
-        return self.population[0]
+        self.winner = self.population[0]
 
 
 class Specimen:
@@ -118,14 +125,20 @@ def paint_map(cities_with_hospitals, r):
 
 
 def main():
+    population_size = 10
+    radius = 187
+    number_of_generations = 10
+
     cities = Cities()
     cities.load_cities("data.csv")
+
     start_time = time.time()
+
+    evolution = Evolution(cities.cities, population_size)
+    evolution.evolve(number_of_generations, radius)
+    winner = evolution.get_best()
+
     cities_with_hospitals = []
-
-    evolution = Evolution(cities.cities, 20)
-    winner = evolution.evolve(300, 187)
-
     for i in range(len(winner.hospitals)):
         if winner.hospitals[i] == 1:
             cities_with_hospitals.append(cities.cities[i])
