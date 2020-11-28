@@ -40,16 +40,14 @@ class Evolution:
 
             for j in self.next_generation:
                 j.mutation_2()
-                j.mutation(1 / 74)
+                j.mutation(1 / len(self.cities))
                 j.check_quality(self.cities, r)
 
             self.next_generation.sort(key=operator.attrgetter('quality'))
             self.population = self.population[0:int(self.population_size / 2)] + self.next_generation[0:int(self.population_size / 2)]
             self.rank_population(r)
 
-            print("---------------new top 7---------------")
-            for j in range(7):
-                print(self.population[j].quality)
+            print("Best specimen of this generation:", self.population[0].quality)
 
         self.winner = self.population[0]
 
@@ -66,7 +64,7 @@ class Specimen:
         score = 0
 
         for i in range(len(cities)):
-            if self.hospitals[i] == 1:
+            if self.hospitals[i]:
                 draw.ellipse((cities[i].x - r, cities[i].y - r, cities[i].x + r, cities[i].y + r),
                              fill=(0, 0, 255))
 
@@ -74,7 +72,7 @@ class Specimen:
 
         if open("imageCheck.png", "rb").read() == open("imageCheck3.png", "rb").read():
             for i in range(len(self.hospitals)):
-                if self.hospitals[i] == 1:
+                if self.hospitals[i]:
                     score += 1
             self.quality = score
         else:
@@ -86,13 +84,13 @@ class Specimen:
                 i = (i + 1) % 2
 
     def mutation_2(self):
-        mutating_gene = random.randint(0, 73)
-        while self.hospitals[mutating_gene] == 0:
-            mutating_gene = random.randint(0, 73)
+        mutating_gene = random.randint(0, self.size - 1)
+        while not self.hospitals[mutating_gene]:
+            mutating_gene = random.randint(0, self.size - 1)
         self.hospitals[mutating_gene] = (self.hospitals[mutating_gene] + 1) % 2
 
     def cross(self, other):
-        where = random.randint(0, 73)
+        where = random.randint(0, self.size - 1)
         gene1 = self.hospitals[where:] + other.hospitals[:where]
         gene2 = other.hospitals[where:] + self.hospitals[:where]
         return [Specimen(self.size, gene1), Specimen(self.size, gene2)]
@@ -125,9 +123,9 @@ def paint_map(cities_with_hospitals, r):
 
 
 def main():
-    population_size = 10
+    population_size = 40
     radius = 187
-    number_of_generations = 10
+    number_of_generations = 20
 
     cities = Cities()
     cities.load_cities("data.csv")
@@ -140,15 +138,16 @@ def main():
 
     cities_with_hospitals = []
     for i in range(len(winner.hospitals)):
-        if winner.hospitals[i] == 1:
+        if winner.hospitals[i]:
             cities_with_hospitals.append(cities.cities[i])
 
-    paint_map(cities_with_hospitals, 187)
+    paint_map(cities_with_hospitals, radius)
 
+    print("Winner:", len(cities_with_hospitals))
+    print("Hospitals located in the following cities:")
     for i in range(len(cities_with_hospitals)):
         print(cities_with_hospitals[i].name)
 
-    print(len(cities_with_hospitals))
     print("--- %s seconds ---" % (time.time() - start_time))
 
 
