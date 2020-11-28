@@ -33,8 +33,8 @@ class Evolution:
 
             for x in self.next_generation:
                 x.mutation_2()
+                x.mutation(1 / 74)
                 x.check_quality(self.cities, r)
-                # x.mutation(1/74)
 
             self.next_generation.sort(key=operator.attrgetter('quality'))
             self.population = self.population[0:10] + self.next_generation[0:10]
@@ -124,7 +124,7 @@ def main():
     cities_with_hospitals = []
 
     evolution = Evolution(cities.cities, 20)
-    winner = evolution.evolve(100, 187)
+    winner = evolution.evolve(300, 187)
 
     for i in range(len(winner.hospitals)):
         if winner.hospitals[i] == 1:
