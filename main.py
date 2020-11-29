@@ -2,6 +2,7 @@ import random
 from PIL import Image, ImageDraw
 import time
 import operator
+import csv
 
 
 class City:
@@ -46,8 +47,6 @@ class Evolution:
             self.next_generation.sort(key=operator.attrgetter('quality'))
             self.population = self.population[0:int(self.population_size / 2)] + self.next_generation[0:int(self.population_size / 2)]
             self.rank_population(r)
-
-            print("Best specimen of this generation:", self.population[0].quality)
 
         self.winner = self.population[0]
 
@@ -123,32 +122,42 @@ def paint_map(cities_with_hospitals, r):
 
 
 def main():
-    population_size = 40
+    p = [10, 20, 40, 80]
+    g = [160]
+
     radius = 187
-    number_of_generations = 20
 
     cities = Cities()
     cities.load_cities("data.csv")
+    results = []
 
-    start_time = time.time()
+    for pop in p:
+        print("Pop:", pop)
+        for gen in g:
+            print("Gen:", gen)
+            for _ in range(5):
+                start_time = time.time()
 
-    evolution = Evolution(cities.cities, population_size)
-    evolution.evolve(number_of_generations, radius)
-    winner = evolution.get_best()
+                evolution = Evolution(cities.cities, pop)
+                evolution.evolve(gen, radius)
+                winner = evolution.get_best()
 
-    cities_with_hospitals = []
-    for i in range(len(winner.hospitals)):
-        if winner.hospitals[i]:
-            cities_with_hospitals.append(cities.cities[i])
+                cities_with_hospitals = []
+                for i in range(len(winner.hospitals)):
+                    if winner.hospitals[i]:
+                        cities_with_hospitals.append(cities.cities[i])
 
-    paint_map(cities_with_hospitals, radius)
+                results.append([pop, gen, (len(cities_with_hospitals)), (time.time() - start_time)])
 
-    print("Winner:", len(cities_with_hospitals))
-    print("Hospitals located in the following cities:")
-    for i in range(len(cities_with_hospitals)):
-        print(cities_with_hospitals[i].name)
+    print(results)
+    f = open('results5.csv', 'w')
 
-    print("--- %s seconds ---" % (time.time() - start_time))
+    with f:
+
+        writer = csv.writer(f)
+
+        for line in results:
+            writer.writerow(line)
 
 
 if __name__ == '__main__':
